@@ -1,4 +1,4 @@
-import { addContact, deleteContact, fetchAll } from './operations';
+import { addContact, deleteContact, editContact, fetchAll } from './operations';
 
 const { createSlice, isAnyOf } = require('@reduxjs/toolkit');
 
@@ -8,9 +8,14 @@ const defaultStatus = {
   rejected: 'rejected',
 };
 
-const initialState = { items: [], isLoading: false, error: null };
+const initialState = {
+  items: [],
+  isLoading: false,
+  error: null,
+  editContact: null,
+};
 
-const actionsArr = [fetchAll, addContact, deleteContact];
+const actionsArr = [fetchAll, addContact, deleteContact, editContact];
 
 const getActionsStatusArr = status => {
   return actionsArr.map(el => el[status]);
@@ -34,6 +39,14 @@ const handleRejected = (state, action) => {
 const contactsSlice = createSlice({
   name: 'contacts',
   initialState,
+  reducers: {
+    openEditModal(state, action) {
+      state.editContact = action.payload;
+    },
+    closeEditModal(state) {
+      state.editContact = null;
+    },
+  },
   extraReducers: builder => {
     builder
       .addMatcher(
@@ -51,5 +64,5 @@ const contactsSlice = createSlice({
   },
 });
 
-export const { add, remove } = contactsSlice.actions;
+export const { openEditModal, closeEditModal } = contactsSlice.actions;
 export const contactsReducer = contactsSlice.reducer;

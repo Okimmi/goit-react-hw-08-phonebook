@@ -1,35 +1,56 @@
-import { ContactForm } from './ContactForm/ContactForm';
-import { Toaster, toast } from 'react-hot-toast';
-import { Contacts } from './Contacts/Contacts';
+import { Route, Routes } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { Container } from '@mui/material';
+import { ContactsPage } from 'pages/ContactsPage';
 import { GlobalStyle } from './GlobalStyle';
-import { Layout } from './Layout';
-import { Filter } from './Filter/Filter';
-import { useSelector } from 'react-redux';
-import { selectError, selectErrorNotify, selectLoading } from 'redux/selectors';
-import { Loader } from './Loader/Loader';
-import { useEffect } from 'react';
+import { LogInPage } from 'pages/LogInPage';
+import { RegisterPage } from 'pages/RegisterPage';
+import { refreshUser } from 'redux/auth/operations';
+import { Navigator } from './Navigator/Navigator';
+import { RestrictedRoute } from './RestrictedRoute';
+import { PrivateRoute } from './PrivateRoute';
 
 export const App = () => {
-  const isLoading = useSelector(selectLoading);
-  const isError = useSelector(selectError);
-  const errorNotify = useSelector(selectErrorNotify);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (isError) {
-      toast.error(errorNotify);
-    }
-  }, [isError, errorNotify]);
+    dispatch(refreshUser());
+  }, [dispatch]);
 
   return (
-    <Layout>
-      <h1>Phonebook</h1>
-      <ContactForm></ContactForm>
-      <h2>Contacts</h2>
-      <Filter></Filter>
-      <Contacts></Contacts>
-      {isLoading && <Loader />}
-      <Toaster />
-      <GlobalStyle></GlobalStyle>
-    </Layout>
+    <Container>
+      <Navigator />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <PrivateRoute redirectTo="/log-in" component={<ContactsPage />} />
+          }
+        />
+        <Route
+          path="/contacts"
+          element={
+            <PrivateRoute redirectTo="/log-in" component={<ContactsPage />} />
+          }
+        ></Route>
+        <Route
+          path="/register"
+          element={
+            <RestrictedRoute
+              redirectTo="/contacts"
+              component={<RegisterPage />}
+            />
+          }
+        ></Route>
+        <Route
+          path="/log-in"
+          element={
+            <RestrictedRoute redirectTo="/contacts" component={<LogInPage />} />
+          }
+        ></Route>
+      </Routes>
+      <GlobalStyle />
+    </Container>
   );
 };

@@ -1,73 +1,61 @@
-import { Formik } from 'formik';
-import * as yup from 'yup';
-import {
-  Btn,
-  ErrorText,
-  FormWrapper,
-  Input,
-  InputName,
-  ListItem,
-} from './ContactForm.styled';
-import { useDispatch, useSelector } from 'react-redux';
-import { addContact } from 'redux/operations';
-import { selectContacts } from 'redux/selectors';
+import { useFormik } from 'formik';
+import { useSelector } from 'react-redux';
+import { Box, TextField } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { schema } from './ContactFormSchema';
+import { selectLoading } from 'redux/contacts/selectors';
 
-const schema = yup.object().shape({
-  name: yup
-    .string()
-    .matches(
-      /^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$/,
-      "Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-    )
-    .required(),
-  number: yup
-    .string()
-    .matches(
-      /^\+?\d{1,4}[-.\s]?\(?\d{1,3}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/,
-      'Phone number must be digits and can contain spaces, dashes, parentheses and can start with +'
-    )
-    .required(),
-});
+export const ContactForm = ({ children, initialValues, onSubmit, style }) => {
+  const loading = useSelector(selectLoading);
 
-export const ContactForm = () => {
-  const dispatch = useDispatch();
-  const contacts = useSelector(selectContacts);
-
-  const isAlreadyExists = inputName => {
-    return contacts.some(({ name }) => name === inputName);
-  };
-
-  const onAddContact = (values, actions) => {
-    if (isAlreadyExists(values.name)) {
-      window.alert(values.name + ' is already in contacts.');
-    } else {
-      dispatch(addContact(values));
-      actions.resetForm();
-    }
-  };
+  const formik = useFormik({
+    initialValues,
+    validationSchema: schema,
+    onSubmit,
+  });
 
   return (
-    <Formik
-      initialValues={{ name: '', number: '' }}
-      validationSchema={schema}
-      onSubmit={onAddContact}
-    >
-      <FormWrapper>
-        <ul>
-          <ListItem>
-            <InputName htmlFor="name">Name</InputName>
-            <Input type="text" name="name" id="name" />
-            <ErrorText name="name" component="p" />
-          </ListItem>
-          <ListItem>
-            <InputName htmlFor="number">Number</InputName>
-            <Input type="tel" name="number" id="number" />
-            <ErrorText name="number" component="p" />
-          </ListItem>
-        </ul>
-
-        <Btn type="submit">Add contact</Btn>
-      </FormWrapper>
-    </Formik>
+    <Box sx={style}>
+      <form onSubmit={formik.handleSubmit}>
+        <TextField
+          name="name"
+          label="Name"
+          type="text"
+          id="name"
+          variant="filled"
+          margin="dense"
+          fullWidth
+          value={formik.values.name}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.name && Boolean(formik.errors.name)}
+          helperText={formik.touched.name && formik.errors.name}
+        />
+        <TextField
+          name="number"
+          label="Number"
+          type="tel"
+          id="number"
+          variant="filled"
+          margin="dense"
+          fullWidth
+          value={formik.values.number}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.number && Boolean(formik.errors.number)}
+          helperText={formik.touched.number && formik.errors.number}
+        />
+        <LoadingButton
+          variant="contained"
+          type="submit"
+          loading={loading}
+          sx={{
+            mt: 2,
+          }}
+        >
+          {children}
+        </LoadingButton>
+      </form>
+    </Box>
   );
 };

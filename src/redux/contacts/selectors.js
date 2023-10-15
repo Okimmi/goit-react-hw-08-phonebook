@@ -4,6 +4,7 @@ export const selectContacts = state => state.contacts.items;
 export const selectFilter = state => state.filter;
 export const selectLoading = state => state.contacts.isLoading;
 export const selectError = state => state.contacts.error;
+export const selectEditContact = state => state.contacts.editContact;
 
 export const selectFilteredContacts = createSelector(
   [selectContacts, selectFilter],
@@ -13,10 +14,16 @@ export const selectFilteredContacts = createSelector(
     )
 );
 
+export const selectEditContactData = createSelector(
+  [selectContacts, selectEditContact],
+  (contacts, editId) => contacts.filter(({ id }) => id === editId)
+);
+
 const defaultApiActions = {
   get: 'get',
   post: 'post',
   delete: 'delete',
+  patch: 'patch',
 };
 
 export const selectErrorNotify = createSelector([selectError], error => {
@@ -27,6 +34,8 @@ export const selectErrorNotify = createSelector([selectError], error => {
       return 'Contact addition encountered an issue.';
     case defaultApiActions.delete:
       return 'Contact removal encountered an issue.';
+    case defaultApiActions.patch:
+      return 'Contact redaction encountered an issue.';
     default:
       return;
   }
