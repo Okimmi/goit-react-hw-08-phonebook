@@ -100,7 +100,7 @@ export const Navigator = () => {
                     ml: 'auto',
                   }}
                 />
-                <Tab label="Log In" component={NavLink} to="/log-in" />
+                <Tab label="Log In" component={NavLink} to="/login" />
               </Tabs>
             </Box>
           )}

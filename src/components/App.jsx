@@ -10,6 +10,7 @@ import { refreshUser } from 'redux/auth/operations';
 import { Navigator } from './Navigator/Navigator';
 import { RestrictedRoute } from './RestrictedRoute';
 import { PrivateRoute } from './PrivateRoute';
+import { NotFoundPage } from 'pages/NotFoundPage';
 
 export const App = () => {
   const dispatch = useDispatch();
@@ -25,13 +26,13 @@ export const App = () => {
         <Route
           path="/"
           element={
-            <PrivateRoute redirectTo="/log-in" component={<ContactsPage />} />
+            <PrivateRoute redirectTo="/login" component={<ContactsPage />} />
           }
         />
         <Route
           path="/contacts"
           element={
-            <PrivateRoute redirectTo="/log-in" component={<ContactsPage />} />
+            <PrivateRoute redirectTo="/login" component={<ContactsPage />} />
           }
         ></Route>
         <Route
@@ -44,11 +45,12 @@ export const App = () => {
           }
         ></Route>
         <Route
-          path="/log-in"
+          path="/login"
           element={
             <RestrictedRoute redirectTo="/contacts" component={<LogInPage />} />
           }
         ></Route>
+        <Route path="*" element={<NotFoundPage />}></Route>
       </Routes>
       <GlobalStyle />
     </Container>

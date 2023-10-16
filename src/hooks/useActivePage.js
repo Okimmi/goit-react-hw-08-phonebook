@@ -13,7 +13,7 @@ export const useActivePage = () => {
   switch (location.pathname) {
     case '/register':
       return 0;
-    case '/log-in':
+    case '/login':
       return 1;
     default:
       return 1;
